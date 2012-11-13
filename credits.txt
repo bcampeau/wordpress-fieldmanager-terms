@@ -1,0 +1,10 @@
+This plugin builds on the wordpress-fieldmanager framework to offer automatic term extraction
+from post content for taxonomy-enabled fields
+
+Authors:
+
+* Brad Campeau-Laurion, Chief Technologist, Alley Interactive LLC
+
+Open Source components consulted or used:
+
+* [11/13/12] Dependency on the wordpress-fieldmanager framework
