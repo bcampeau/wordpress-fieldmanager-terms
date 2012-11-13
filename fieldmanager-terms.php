@@ -1,6 +1,7 @@
 <?php
 /**
- * @package Fieldmanager-Terms
+ * @package Fieldmanager
+ * @subpackage Terms
  * @version 0.1
  */
 /*
@@ -12,5 +13,14 @@ Version: 0.1
 Author URI: http://www.alleyinteractive.com/
 */
 
-require_once( dirname( __FILE__ ) . '/php/class-fieldmanager-terms.php' );
-require_once( dirname( __FILE__ ) . '/php/class-fieldmanager-terms.php' );
+//require_once( dirname( __FILE__ ) . '/php/class-fieldmanager-terms.php' );
+require_once( dirname( __FILE__ ) . '/php/class-plugin-dependency.php' );
+
+function fieldmanager_terms_dependency() {
+	$fieldmanager_dependency = new Plugin_Dependency( 'Fieldmanager Terms', 'Fieldmanager', 'https://github.com/netaustin/wordpress-fieldmanager' );
+	if( !$fieldmanager_dependency->verify() ) {
+		// Cease activation
+	 	die( $fieldmanager_dependency->message() );
+	}
+}
+register_activation_hook( __FILE__, 'fieldmanager_terms_dependency' );
