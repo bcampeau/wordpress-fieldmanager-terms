@@ -9,7 +9,7 @@ class Fieldmanager_Terms {
 	public $automatic = false;
 	
 	/** @type string Label for term extraction button */ 
-	public $suggest_label = "Suggest Terms";
+	public $button_label = "Suggest Terms";
 	
 	/** @type array List of common words to strip out before term extraction */ 
 	private $most_common_words = array( 'the','be','to','of','and','a','in','that','have','I','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','say','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','when','make','can','like','time','no','just','him','know','take','people','into','year','your','good','some','could','them','see','other','than','then','now','look','only','come','its','over','think','also','back','after','use','two','how','our','work','first','well','way','even','new','want','because','any','these','give','day','most','us' );
@@ -57,7 +57,7 @@ class Fieldmanager_Terms {
 				
 		// Pass the post title and content to term extraction if one if them is not empty. 
 		// Otherwise return the empty array.
-		if( trim( $_POST['post_title'] ) != "" || trim( $_POST['post_content'] ) != "" ) {
+		if( trim( ( $_POST['post_title'] ) != "" || trim( $_POST['post_content'] ) != "" ) && $_POST['taxonomy'] != "" ) {
 			$result  = $this->extract_terms( $_POST['post_title'],  $_POST['post_content'], explode( ",", $_POST['taxonomy'] ) );
 		}
 
@@ -146,12 +146,12 @@ class Fieldmanager_Terms {
 	 */
 	public function suggest_terms( $related_field_id, $taxonomy ) {
 		$classes = array( 'fm-terms-suggest', 'fm-terms-suggest-' . $this->field_name );
-		$out = '<div class="fm-suggest-terms-wrapper">';
+		$out = '<div class="fm-terms-suggest-wrapper">';
 		$out .= sprintf(
 			'<input type="button" class="%s" value="%s" name="%s" data-related-element="%s" data-taxonomy="%s" />',
 			implode( ' ', $classes ),
-			__( $this->suggest_label ),
-			'fm_add_another_' . $this->field_name,
+			__( $this->button_label ),
+			'fm_terms_suggest_' . $this->field_name,
 			$related_field_id,
 			( is_array( $taxonomy ) ) ? implode( ",", $taxonomy ) : $taxonomy
 		);
