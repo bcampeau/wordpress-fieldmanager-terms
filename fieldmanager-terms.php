@@ -13,7 +13,7 @@ Version: 0.1
 Author URI: http://www.alleyinteractive.com/
 */
 
-//require_once( dirname( __FILE__ ) . '/php/class-fieldmanager-terms.php' );
+require_once( dirname( __FILE__ ) . '/php/class-fieldmanager-terms.php' );
 require_once( dirname( __FILE__ ) . '/php/class-plugin-dependency.php' );
 
 function fieldmanager_terms_dependency() {
