@@ -5,12 +5,15 @@ class Fieldmanager_Terms {
 	/** @type string Fieldmanager field name to augment with term extraction */ 
 	public $field_name;
 	
-	/** @type array Taxonomies to search for term extraction */ 
-	public $taxonomy = null;
+	/** @type boolean Indicates if we should automatically extract terms */ 
+	public $automatic = false;
 	
 	/** @type string Label for term extraction button */ 
 	public $suggest_label = "Suggest Terms";
 	
+	/** @type array List of common words to strip out before term extraction */ 
+	private $most_common_words = array( 'the','be','to','of','and','a','in','that','have','I','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','say','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','when','make','can','like','time','no','just','him','know','take','people','into','year','your','good','some','could','them','see','other','than','then','now','look','only','come','its','over','think','also','back','after','use','two','how','our','work','first','well','way','even','new','want','because','any','these','give','day','most','us' );
+
 	public function __construct( $options = array() ) {
 		// Extract options
 		foreach ( $options as $k => $v ) {
@@ -35,7 +38,7 @@ class Fieldmanager_Terms {
 		add_filter( 'fm_element_markup_end', array( $this, 'modify_form_element' ), 10, 2 ); 
 		
 		// Add the Fieldmanager Terms javascript library
-		fm_add_script( 'fm_terms_js', 'js/fieldmanager-terms.js', array(), false, false, 'fm_terms', array( 'nonce' => wp_create_nonce( 'fm_terms_extract_nonce' ) ) );
+		fm_add_script( 'fm_terms_js', 'js/fieldmanager-terms.js', array(), false, false, 'fm_terms', array( 'nonce' => wp_create_nonce( 'fm_terms_extract_nonce' ) ), fieldmanager_terms_get_baseurl() );
 
 	}
 	
@@ -51,13 +54,13 @@ class Fieldmanager_Terms {
 		
 		// Create an array to hold the results.
 		$result = array();
-		
+				
 		// Pass the post title and content to term extraction if one if them is not empty. 
 		// Otherwise return the empty array.
 		if( trim( $_POST['post_title'] ) != "" || trim( $_POST['post_content'] ) != "" ) {
-			$result  = extract_terms( $_POST['post_title'],  $_POST['post_content'] );
+			$result  = $this->extract_terms( $_POST['post_title'],  $_POST['post_content'], explode( ",", $_POST['taxonomy'] ) );
 		}
-		
+
 		echo json_encode( $result );
 		
 		die();
@@ -69,7 +72,7 @@ class Fieldmanager_Terms {
 	 * @params string $post_type
 	 * @return void
 	 */
-	public function extract_terms( $post_title, $post_content ) {
+	public function extract_terms( $post_title, $post_content, $taxonomy ) {
 		
 		// Merge the post title and content and strip all tags
 		$filtered_content = strip_tags( $post_title . " " . $post_content );
@@ -82,22 +85,20 @@ class Fieldmanager_Terms {
 	
 		// Strip the most common words from the text
 		$most_common_words = array();
-		foreach( sn_config( 'most_common_words' ) as $common_word ) {
+		foreach( $this->most_common_words as $common_word ) {
 			$most_common_words[] = '/(^|\s+)' . $common_word . '(\s+|$)/i';
 		}
 		$filtered_content = preg_replace( $most_common_words, " ", $filtered_content );
-		
+				
 		// See if any taxonomy terms are contained within the content
 		$term_matches = array();
 		
 		// Check if taxonomies are defined. Do not proceed if not.
 		// Also ensure this is an array.
-		if( $this->taxonomy == null || empty( $this->taxonomy ) ) return $term_matches;
+		if( $taxonomy == null || empty( $taxonomy ) ) return $term_matches;
+		if( !is_array( $taxonomy ) ) $taxonomy = array( $taxonomy );
 		
-		if( !is_array( $this->taxonomy ) ) $taxonomy_names = array( $this->taxonomy );
-		else $taxonomy_names = $this->taxonomy;
-		
-		foreach( $taxonomy_names as $taxonomy_name ) {
+		foreach( $taxonomy as $taxonomy_name ) {
 			
 			// Get data for the taxonomy
 			$taxonomy_data = get_taxonomy( $taxonomy_name );
@@ -134,10 +135,7 @@ class Fieldmanager_Terms {
 		if ( $field->name == $this->field_name 
 			&& get_class( $field ) == "Fieldmanager_Select"
 			&& isset( $field->taxonomy )
-			&& !empty( $field->taxonomy ) ) $value .= suggest_terms( $field->get_element_id() );
-
-		// Store the taxonomies used by the field for later use
-		$this->taxonomy = $field->taxonomy;
+			&& !empty( $field->taxonomy ) ) $value .= $this->suggest_terms( $field->get_element_id(), $field->taxonomy );
 		
 		return $value;
 	}
@@ -146,15 +144,16 @@ class Fieldmanager_Terms {
 	 * Generates HTML for the "Suggest Terms" button.
 	 * @return string button HTML.
 	 */
-	public function suggest_terms( $related_field_id ) {
+	public function suggest_terms( $related_field_id, $taxonomy ) {
 		$classes = array( 'fm-terms-suggest', 'fm-terms-suggest-' . $this->field_name );
 		$out = '<div class="fm-suggest-terms-wrapper">';
 		$out .= sprintf(
-			'<input type="button" class="%s" value="%s" name="%s" data-related-element="%s" />',
+			'<input type="button" class="%s" value="%s" name="%s" data-related-element="%s" data-taxonomy="%s" />',
 			implode( ' ', $classes ),
 			__( $this->suggest_label ),
 			'fm_add_another_' . $this->field_name,
-			$related_field_id
+			$related_field_id,
+			( is_array( $taxonomy ) ) ? implode( ",", $taxonomy ) : $taxonomy
 		);
 		$out .= '</div>';
 		return $out;

@@ -24,3 +24,11 @@ function fieldmanager_terms_dependency() {
 	}
 }
 register_activation_hook( __FILE__, 'fieldmanager_terms_dependency' );
+
+/**
+ * Get the base URL for this plugin.
+ * @return string URL pointing to Fieldmanager Terms top directory.
+ */
+function fieldmanager_terms_get_baseurl() {
+	return plugin_dir_url( __FILE__ );
+}
