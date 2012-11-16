@@ -5,8 +5,8 @@ class Fieldmanager_Terms {
 	/** @type string Fieldmanager field name to augment with term extraction */ 
 	public $field_name;
 	
-	/** @type boolean Indicates if we should automatically extract terms */ 
-	public $automatic = false;
+	/** @type boolean Specify a minimum length under which content would not searched for terms */ 
+	public $minimum_content_length;
 	
 	/** @type string Label for term extraction button */ 
 	public $button_label = "Suggest Terms";
@@ -90,8 +90,10 @@ class Fieldmanager_Terms {
 		}
 		$filtered_content = preg_replace( $most_common_words, " ", $filtered_content );
 				
-		// See if any taxonomy terms are contained within the content
 		$term_matches = array();
+		
+		// Check if the minimum content length is set. If the content is under this limit, return an empty array.
+		if( isset( $this->minimum_content_length ) && is_numeric( $this->minimum_content_length ) && strlen( $filtered_content ) < $this->minimum_content_length ) return $term_matches;
 		
 		// Check if taxonomies are defined. Do not proceed if not.
 		// Also ensure this is an array.
@@ -148,10 +150,11 @@ class Fieldmanager_Terms {
 		$classes = array( 'fm-terms-suggest', 'fm-terms-suggest-' . $this->field_name );
 		$out = '<div class="fm-terms-suggest-wrapper">';
 		$out .= sprintf(
-			'<input type="button" class="%s" value="%s" name="%s" data-related-element="%s" data-taxonomy="%s" />',
+			'<input type="button" class="%s" value="%s" name="%s" id="%s" data-related-element="%s" data-taxonomy="%s" />',
 			implode( ' ', $classes ),
 			__( $this->button_label ),
 			'fm_terms_suggest_' . $this->field_name,
+			$related_field_id . "-suggest",
 			$related_field_id,
 			( is_array( $taxonomy ) ) ? implode( ",", $taxonomy ) : $taxonomy
 		);
