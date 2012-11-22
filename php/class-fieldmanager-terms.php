@@ -5,7 +5,7 @@ class Fieldmanager_Terms {
 	/** @type string Fieldmanager field name to augment with term extraction */ 
 	public $field_name;
 	
-	/** @type boolean Specify a minimum length under which content would not searched for terms */ 
+	/** @type int Specify a minimum length under which content would not searched for terms */ 
 	public $minimum_content_length;
 	
 	/** @type string Label for term extraction button */ 
@@ -73,7 +73,7 @@ class Fieldmanager_Terms {
 	 * @return void
 	 */
 	public function extract_terms( $post_title, $post_content, $taxonomy ) {
-		
+
 		// Merge the post title and content and strip all tags
 		$filtered_content = strip_tags( $post_title . " " . $post_content );
 		
@@ -89,7 +89,7 @@ class Fieldmanager_Terms {
 			$most_common_words[] = '/(^|\s+)' . $common_word . '(\s+|$)/i';
 		}
 		$filtered_content = preg_replace( $most_common_words, " ", $filtered_content );
-				
+						
 		$term_matches = array();
 		
 		// Check if the minimum content length is set. If the content is under this limit, return an empty array.
@@ -101,19 +101,18 @@ class Fieldmanager_Terms {
 		if( !is_array( $taxonomy ) ) $taxonomy = array( $taxonomy );
 		
 		foreach( $taxonomy as $taxonomy_name ) {
-			
+
 			// Get data for the taxonomy
 			$taxonomy_data = get_taxonomy( $taxonomy_name );
 				
 			// Get all terms for this taxonomy 
 			$terms = get_terms( $taxonomy_name );
-			
+
 			foreach( $terms as $term ) {
-			
+
 				// If the term was matched, store it in a taxonomy-specific array
 				if( preg_match( '/(^|\s+)' . $term->name . '(\s+|$)/i', $filtered_content ) ) { 
 					$term_matches[$taxonomy_data->label][] = $term->term_id;
-
 					// Apply a filter to allow for additional processing on this match
 					$term_matches = apply_filters( 'fm_terms_match', $term_matches, $term );
 				}
