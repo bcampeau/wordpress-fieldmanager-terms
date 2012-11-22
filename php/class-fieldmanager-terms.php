@@ -105,8 +105,8 @@ class Fieldmanager_Terms {
 			// Get data for the taxonomy
 			$taxonomy_data = get_taxonomy( $taxonomy_name );
 				
-			// Get all terms for this taxonomy 
-			$terms = get_terms( $taxonomy_name );
+			// Get all terms for this taxonomy (even the terms with no posts associated with them)
+			$terms = get_terms( $taxonomy_name, 'hide_empty=0' );
 
 			foreach( $terms as $term ) {
 
