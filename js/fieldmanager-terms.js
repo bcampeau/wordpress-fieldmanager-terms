@@ -4,18 +4,11 @@ var fm_terms_element;
 
 fm_terms_suggest = function( $element ) {
 	// If the post title and content are both empty, do nothing
-	console.log( $element );
 	if ( $("#title").val() != "" || tinymce.activeEditor.getContent() != "" ) {
 		// Store the element we are working with
 		fm_terms_element = $element.data('relatedElement');
-		console.log( fm_terms_element );
 		// Query for matching terms
-		console.log( $("#title").val() );
-		console.log( tinymce.activeEditor.getContent() );
-		console.log( $element.data("taxonomy") );
-		console.log( fm_terms.nonce );
 		$.post( ajaxurl, { action: 'fm_terms_extract', post_title: $("#title").val(), post_content: tinymce.activeEditor.getContent(), taxonomy: $element.data("taxonomy"), fm_terms_extract_nonce: fm_terms.nonce }, function ( result ) {
-			console.log ( result );
 			resultObj = JSON.parse( result );
 			// Check if there were results
 			if( !$.isEmptyObject( resultObj ) && fm_terms_element != "" ) {
@@ -26,9 +19,7 @@ fm_terms_suggest = function( $element ) {
 						var selector = '#' + fm_terms_element;
 						if( $( selector + ' optgroup' ).length != 0 ) selector = selector + ' optgroup[label="' + taxonomy + '"]';
 						selector = selector + ' option[value="' + term_id + '"]';
-						
-						console.log( term_id );
-						
+
 						// Select the element
 						$(selector).attr('selected', 'selected');
 					});

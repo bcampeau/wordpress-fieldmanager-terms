@@ -118,7 +118,6 @@ class Fieldmanager_Terms {
 				// If the term was matched, store it in a taxonomy-specific array
 				$term_name = str_replace( "/", "\/", $term->name );
 				$term_name = apply_filters( 'fm_terms_pre_match', $term_name, $term->term_id );
-				if( strpos( $term_name, "Test" ) !== FALSE ) error_log( "regex:" . '/(^|\s+)' . $term_name . '(\s+|$)/i' );
 				
 				if( preg_match( '/(^|\s+)' . $term_name . '(\s+|$)/i', $filtered_content ) ) { 
 					$term_matches[$taxonomy_data->label][] = $term->term_id;
