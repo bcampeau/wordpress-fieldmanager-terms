@@ -116,7 +116,11 @@ class Fieldmanager_Terms {
 			foreach( $terms as $term ) {
 
 				// If the term was matched, store it in a taxonomy-specific array
-				if( preg_match( '/(^|\s+)' . $term->name . '(\s+|$)/i', $filtered_content ) ) { 
+				$term_name = str_replace( "/", "\/", $term->name );
+				$term_name = apply_filters( 'fm_terms_pre_match', $term_name, $term->term_id );
+				if( strpos( $term_name, "Test" ) !== FALSE ) error_log( "regex:" . '/(^|\s+)' . $term_name . '(\s+|$)/i' );
+				
+				if( preg_match( '/(^|\s+)' . $term_name . '(\s+|$)/i', $filtered_content ) ) { 
 					$term_matches[$taxonomy_data->label][] = $term->term_id;
 					// Apply a filter to allow for additional processing on this match
 					$term_matches = apply_filters( 'fm_terms_match', $term_matches, $term );

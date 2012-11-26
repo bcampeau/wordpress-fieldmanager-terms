@@ -15,8 +15,8 @@ fm_terms_suggest = function( $element ) {
 		console.log( $element.data("taxonomy") );
 		console.log( fm_terms.nonce );
 		$.post( ajaxurl, { action: 'fm_terms_extract', post_title: $("#title").val(), post_content: tinymce.activeEditor.getContent(), taxonomy: $element.data("taxonomy"), fm_terms_extract_nonce: fm_terms.nonce }, function ( result ) {
-			resultObj = JSON.parse( result );
 			console.log ( result );
+			resultObj = JSON.parse( result );
 			// Check if there were results
 			if( !$.isEmptyObject( resultObj ) && fm_terms_element != "" ) {
 				// Iterate over the matches
