@@ -14,14 +14,37 @@ fm_terms_suggest = function( $element ) {
 			if( !$.isEmptyObject( resultObj ) && fm_terms_element != "" ) {
 				// Iterate over the matches
 				$.each( resultObj, function( taxonomy, terms ) {
-					$.each( terms, function( index, term_id ) {
+					$.each( terms, function( index, term ) {
 						// Build the selector
-						var selector = '#' + fm_terms_element;
-						if( $( selector + ' optgroup' ).length != 0 ) selector = selector + ' optgroup[label="' + taxonomy + '"]';
-						selector = selector + ' option[value="' + term_id + '"]';
-
+						var element_selector = '#' + fm_terms_element;
+						if( $( element_selector + ' optgroup' ).length != 0 ) { 
+							// Add the optgroup to the selector
+							var optgroup_selector = element_selector + ' optgroup[label="' + taxonomy + '"]';
+							
+							// Determine if the optgroup exists. If not, create it.
+							if( $(optgroup_selector).length == 0 ) {
+								$(element_selector).append(
+									$("<optgroup></optgroup>" )
+										.attr( "label", taxonomy )
+								);
+							}
+							
+							element_selector = optgroup_selector;
+						}
+							
+						var option_selector = element_selector + ' option[value="' + term.term_id + '"]';
+						
+						// Determine if the option exists. If not, create it.
+						if( $(option_selector).length == 0 ) {
+							$(element_selector).append(
+								$("<option></option>" )
+									.attr( "value", term.term_id )
+									.text( term.name )
+							);
+						}
+	
 						// Select the element
-						$(selector).attr('selected', 'selected');
+						$(option_selector).attr('selected', 'selected');
 					});
 				});
 				
@@ -30,7 +53,6 @@ fm_terms_suggest = function( $element ) {
 				
 				// Also trigger a jQuery event other custom theme scripts can bind to if needed
 				$( "#" + fm_terms_element ).trigger( 'fm_terms_suggest', resultObj );
-
 			}
 			
 			// Clear the terms element since this was used solely for this request

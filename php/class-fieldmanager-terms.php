@@ -120,7 +120,7 @@ class Fieldmanager_Terms {
 				$term_name = apply_filters( 'fm_terms_pre_match', $term_name, $term->term_id );
 				
 				if( preg_match( '/(^|\s+)' . $term_name . '(\s+|$)/i', $filtered_content ) ) { 
-					$term_matches[$taxonomy_data->label][] = $term->term_id;
+					$term_matches[$taxonomy_data->label][] = $term;
 					// Apply a filter to allow for additional processing on this match
 					$term_matches = apply_filters( 'fm_terms_match', $term_matches, $term );
 				}
