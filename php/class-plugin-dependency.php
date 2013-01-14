@@ -47,7 +47,6 @@ if ( !class_exists( "Plugin_Dependency" ) ) {
 		 */
 		public function verify() {
 			$plugin_uri = $this->info();
-			error_log($plugin_uri);
 			if( $plugin_uri === false ) { 
 				// The plugin is not installed. Display the appropriate message and return false.
 				$this->verify_message = $this->install_message();
