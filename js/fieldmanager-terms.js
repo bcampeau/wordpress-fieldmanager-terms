@@ -4,7 +4,7 @@ var fm_terms_element;
 
 fm_terms_suggest = function( $element ) {
 	// If the post title and content are both empty, do nothing
-	if ( $("#title").val() != "" || tinymce.activeEditor.getContent() != "" ) {
+	if ( tinymce.activeEditor != null && ( $("#title").val() != "" || tinymce.activeEditor.getContent() != "" ) ) {
 		// Store the element we are working with
 		fm_terms_element = $element.data('relatedElement');
 		// Query for matching terms
